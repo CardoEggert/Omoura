@@ -139,7 +139,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        user = new User("Jeff", 25, 80.5, 75);
+
+
+        switch(random.nextInt(5)+1){
+            case 1: user = new User("Jeff", 25, 80.5, 75);
+            case 2: user = new User("Josephine", 18, 65.4, 65);
+            case 3: user = new User("Thomas", 35, 100.0, 55);
+            case 4: user = new User("Dracula", 100, 50.5, 7);
+            case 5: user = new User("Joe", 15, 40.2, 89);
+        }
         mCupImage.setImageBitmap(textAsBitmap(chooseNewsAccordingToUser(user), 12F));
         userCalendar = new Calendar();
 
@@ -259,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private String readMockData() {
+    private int readMockData() {
         List<String> relaxIndex = new ArrayList<>();
         List<String> date = new ArrayList<>();
         try {
@@ -288,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         return filterData(relaxIndex, date);
     }
 
-    private String filterData(List<String> relaxIndex, List<String> date) {
+    private int filterData(List<String> relaxIndex, List<String> date) {
         //If under 85 last night then, check if relaxindex is under 70
         if (Integer.parseInt(relaxIndex.get(relaxIndex.size() - 1)) < 85) {
             //If relaxindes is under 70, check weekly average relaxindex
@@ -331,49 +339,52 @@ public class MainActivity extends AppCompatActivity {
 
     private Random random = new Random();
 
-    private String suggestResting() {
-        Integer randomNr = random.nextInt(4) + 1;
-        List<String> restingSuggestions = new ArrayList<>(5);
-        restingSuggestions.add("You've had a hard time recently, have some rest :)");
-        restingSuggestions.add("You don't have anything ahead of you today, get some rest :)");
-        restingSuggestions.add("You've had some bad sleep recently, have some rest :)");
-        restingSuggestions.add("Take some stress off and rest :)");
-        restingSuggestions.add("Resting doesn't hurt today, rest well :)");
-        return restingSuggestions.get(randomNr);
+    private int suggestResting() {
+        Integer randomNr = random.nextInt(5) + 1;
+        switch(randomNr){
+            case 1: return R.drawable.resting1;
+            case 2: return R.drawable.resting2;
+            case 3: return R.drawable.resting3;
+            case 4: return R.drawable.resting4;
+            case 5: return R.drawable.resting5;
+        }
+        return R.drawable.octocat2;
     }
 
-    private String suggestMotivatingQuotes() {
-        Integer randomNr = random.nextInt(4) + 1;
-        List<String> motivatingQuotes = new ArrayList<>(5);
-        motivatingQuotes.add("Today is gonna be an awesome day!");
-        motivatingQuotes.add("Greatness is just around the corner");
-        motivatingQuotes.add("Big changes are happening, take what you can! :D");
-        motivatingQuotes.add("You are awesome!");
-        motivatingQuotes.add("You will be LEGEN-wait-for-it-DARY!");
-        return motivatingQuotes.get(randomNr);
-
+    private int suggestMotivatingQuotes() {
+        Integer randomNr = random.nextInt(5) + 1;
+        switch(randomNr){
+            case 1: return R.drawable.motivating1;
+            case 2: return R.drawable.motivating2;
+            case 3: return R.drawable.motivating3;
+            case 4: return R.drawable.motivating4;
+            case 5: return R.drawable.motivating5;
+        }
+        return R.drawable.octocat2;
     }
 
-    private String suggestToRestWell() {
-        Integer randomNr = random.nextInt(4) + 1;
-        List<String> restWellSuggestions = new ArrayList<>(5);
-        restWellSuggestions.add("Get enough sleep and eat well :)");
-        restWellSuggestions.add("Remember to get enough rest! :)");
-        restWellSuggestions.add("Being well fed is almost as good as being well rested");
-        restWellSuggestions.add("Remember to keep yourself hydrated!");
-        restWellSuggestions.add("Remember to work out and eat well :)");
-        return restWellSuggestions.get(randomNr);
+    private int suggestToRestWell() {
+        Integer randomNr = random.nextInt(5) + 1;
+        switch(randomNr){
+            case 1: return R.drawable.restwell1;
+            case 2: return R.drawable.restwell2;
+            case 3: return R.drawable.restwell3;
+            case 4: return R.drawable.restwell4;
+            case 5: return R.drawable.restwell5;
+        }
+        return R.drawable.octocat2;
     }
 
-    private String suggestTakingTimeOffDuringTheWeekend() {
-        Integer randomNr = random.nextInt(4) + 1;
-        List<String> takeTimeOffSuggestions = new ArrayList<>(5);
-        takeTimeOffSuggestions.add("Take some time off the weekend, you deserve it! :)");
-        takeTimeOffSuggestions.add("You've had a rough week, remember to take some time off this weekend");
-        takeTimeOffSuggestions.add("You've had bad sleep this week, remember to take some time off! :)");
-        takeTimeOffSuggestions.add("When you get a chance, take some time off :)");
-        takeTimeOffSuggestions.add("Try to get rest as soon as you can :)");
-        return takeTimeOffSuggestions.get(randomNr);
+    private int suggestTakingTimeOffDuringTheWeekend() {
+        Integer randomNr = random.nextInt(5) + 1;
+        switch(randomNr){
+            case 1: return R.drawable.taketime1;
+            case 2: return R.drawable.taketime2;
+            case 3: return R.drawable.taketime3;
+            case 4: return R.drawable.taketime4;
+            case 5: return R.drawable.taketime5;
+        }
+        return R.drawable.octocat2;
     }
 
 
@@ -432,9 +443,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getData(View view) {
-        String printThis = readMockData();
-        mCupIdText.setText(printThis);
-        textToDisplayInBitmap.setText(printThis);
+        int resource = readMockData();
+        Bitmap image = BitmapFactory.decodeResource(getResources(),resource);
+        mImage = image;
+        mCupImage.setImageBitmap(mImage);
 
     }
 
@@ -449,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
     public void reset(View view) {
 
         showProgress();
-        Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
+        Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.octocat2);
         mImage = ImageUtils.scaleBitmapToCupSize(image);
         mContrast = ImageProperties.DEFAULT_CONTRACT;
         mContrastSeekBar.setProgress(100);
@@ -459,7 +471,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void send(View view) {
         showProgress();
-        mImage = textAsBitmap(textToDisplayInBitmap.getText().toString(),12F);
         mMukiCupApi.sendImage(mImage, new ImageProperties(mContrast), mCupId);
     }
 
