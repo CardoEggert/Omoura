@@ -1,6 +1,11 @@
 package com.muki;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -8,10 +13,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -28,6 +36,7 @@ import com.muki.core.util.ImageUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Time;
@@ -40,16 +49,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 //Muki code is taken from github, REFRENCE : https://github.com/gustavpaulig/Paulig-Muki
 public class MainActivity extends AppCompatActivity {
-
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private EditText mSerialNumberEdit;
+    private EditText textToDisplayInBitmap;
     private TextView mCupIdText;
     private TextView mDeviceInfoText;
     private ImageView mCupImage;
     private SeekBar mContrastSeekBar;
     private ProgressDialog mProgressDialog;
     private Calendar userCalendar;
+    private Button buttonSave;
 
     private User user;
 
@@ -103,10 +115,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mSerialNumberEdit = (EditText) findViewById(R.id.serailNumberText);
+        textToDisplayInBitmap = (EditText) findViewById(R.id.textToDisplayInBitmap);
         mCupIdText = (TextView) findViewById(R.id.cupIdText);
         mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
         mCupImage = (ImageView) findViewById(R.id.imageSrc);
         mContrastSeekBar = (SeekBar) findViewById(R.id.contrastSeekBar);
+        buttonSave = (Button) findViewById(R.id.buttonSave);
         mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -130,6 +144,48 @@ public class MainActivity extends AppCompatActivity {
         userCalendar = new Calendar();
 
         reset(null);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check
+            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("This app needs location access");
+                builder.setMessage("Please grant location access so this app can detect beacons.");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
+                    public void onDismiss(DialogInterface dialog) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                });
+                builder.show();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    System.out.println("coarse location permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+                return;
+            }
+        }
     }
 
     private String chooseNewsAccordingToUser(User user) {
@@ -147,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
 //        return news.get(2);
 
     }
+
 
     private String filterUserDependingUser(Integer userAge, Double userWeight) {
         Integer tempSwitch = null;
@@ -233,38 +290,38 @@ public class MainActivity extends AppCompatActivity {
 
     private String filterData(List<String> relaxIndex, List<String> date) {
         //If under 85 last night then, check if relaxindex is under 70
-        if (Integer.parseInt(relaxIndex.get(relaxIndex.size()-1))<85){
+        if (Integer.parseInt(relaxIndex.get(relaxIndex.size() - 1)) < 85) {
             //If relaxindes is under 70, check weekly average relaxindex
-            if(Integer.parseInt(relaxIndex.get(relaxIndex.size()-1))<70){
+            if (Integer.parseInt(relaxIndex.get(relaxIndex.size() - 1)) < 70) {
 
-            //Calculate weekly relax index
-            Integer sum = 0;
-            for (String index:relaxIndex) {
-                sum += Integer.parseInt(index);
-            }
-            Integer weeklyRelaxIndex = sum/7;
-            //If weekly relaxindex is under 60, then check the calendar
-            if (weeklyRelaxIndex <60){
-                //If he doesn't have something to do the same day, then tell him to take a day off
-                if (userCalendar.getTodo() == null){
-                    //return "Take a day off and do relaxing breathing exercises";
-                    return suggestResting();
-                }else{
-                    return suggestTakingTimeOffDuringTheWeekend();
+                //Calculate weekly relax index
+                Integer sum = 0;
+                for (String index : relaxIndex) {
+                    sum += Integer.parseInt(index);
                 }
-            }else{
-                if (userCalendar.getTodo() == null){
+                Integer weeklyRelaxIndex = sum / 7;
+                //If weekly relaxindex is under 60, then check the calendar
+                if (weeklyRelaxIndex < 60) {
+                    //If he doesn't have something to do the same day, then tell him to take a day off
+                    if (userCalendar.getTodo() == null) {
+                        //return "Take a day off and do relaxing breathing exercises";
+                        return suggestResting();
+                    } else {
+                        return suggestTakingTimeOffDuringTheWeekend();
+                    }
+                } else {
+                    if (userCalendar.getTodo() == null) {
+                        //return "Take a day off and do relaxing breathing exercises";
+                        return suggestToRestWell();
+                    } else {
+                        return suggestMotivatingQuotes();
+                    }
+                }
+            } else {
+                if (userCalendar.getTodo() == null) {
                     //return "Take a day off and do relaxing breathing exercises";
                     return suggestToRestWell();
-                }else{
-                    return suggestMotivatingQuotes();
-                }
-            }
-            }else{
-                if (userCalendar.getTodo() == null){
-                    //return "Take a day off and do relaxing breathing exercises";
-                    return suggestToRestWell();
-                }else{
+                } else {
                     return suggestMotivatingQuotes();
                 }
             }
@@ -275,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
     private Random random = new Random();
 
     private String suggestResting() {
-        Integer randomNr = random.nextInt(4)+1;
+        Integer randomNr = random.nextInt(4) + 1;
         List<String> restingSuggestions = new ArrayList<>(5);
         restingSuggestions.add("You've had a hard time recently, have some rest :)");
         restingSuggestions.add("You don't have anything ahead of you today, get some rest :)");
@@ -284,8 +341,9 @@ public class MainActivity extends AppCompatActivity {
         restingSuggestions.add("Resting doesn't hurt today, rest well :)");
         return restingSuggestions.get(randomNr);
     }
+
     private String suggestMotivatingQuotes() {
-        Integer randomNr = random.nextInt(4)+1;
+        Integer randomNr = random.nextInt(4) + 1;
         List<String> motivatingQuotes = new ArrayList<>(5);
         motivatingQuotes.add("Today is gonna be an awesome day!");
         motivatingQuotes.add("Greatness is just around the corner");
@@ -295,8 +353,9 @@ public class MainActivity extends AppCompatActivity {
         return motivatingQuotes.get(randomNr);
 
     }
+
     private String suggestToRestWell() {
-        Integer randomNr = random.nextInt(4)+1;
+        Integer randomNr = random.nextInt(4) + 1;
         List<String> restWellSuggestions = new ArrayList<>(5);
         restWellSuggestions.add("Get enough sleep and eat well :)");
         restWellSuggestions.add("Remember to get enough rest! :)");
@@ -305,8 +364,9 @@ public class MainActivity extends AppCompatActivity {
         restWellSuggestions.add("Remember to work out and eat well :)");
         return restWellSuggestions.get(randomNr);
     }
+
     private String suggestTakingTimeOffDuringTheWeekend() {
-        Integer randomNr = random.nextInt(4)+1;
+        Integer randomNr = random.nextInt(4) + 1;
         List<String> takeTimeOffSuggestions = new ArrayList<>(5);
         takeTimeOffSuggestions.add("Take some time off the weekend, you deserve it! :)");
         takeTimeOffSuggestions.add("You've had a rough week, remember to take some time off this weekend");
@@ -315,7 +375,6 @@ public class MainActivity extends AppCompatActivity {
         takeTimeOffSuggestions.add("Try to get rest as soon as you can :)");
         return takeTimeOffSuggestions.get(randomNr);
     }
-
 
 
     private List<String> readNewsData(Integer from, Integer to) {
@@ -354,22 +413,28 @@ public class MainActivity extends AppCompatActivity {
     public Bitmap textAsBitmap(String text, float textSize) {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE);
         paint.setTextSize(textSize);
-        paint.setColor(Color.BLACK);
+        paint.setColor(Color.WHITE);
         paint.setTextAlign(Paint.Align.LEFT);
         float baseline = -paint.ascent(); // ascent() is negative
         int width = 176; // round
         int height = 264;
         Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
-        canvas.drawText(text, 0, baseline, paint);
+//        while(text.length()!=0){
+//            canvas.drawText(text.substring(0,1),0,baseline,paint);
+//            text = text.substring(2);
+//        }
+        for(int i= 0;i<264;i+=14) {
+            canvas.drawText(text, 0, baseline+i, paint);
+        }
         return image;
     }
 
     public void getData(View view) {
         String printThis = readMockData();
         mCupIdText.setText(printThis);
+        textToDisplayInBitmap.setText(printThis);
 
     }
 
@@ -382,6 +447,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void reset(View view) {
+
         showProgress();
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
         mImage = ImageUtils.scaleBitmapToCupSize(image);
@@ -393,6 +459,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void send(View view) {
         showProgress();
+        mImage = textAsBitmap(textToDisplayInBitmap.getText().toString(),12F);
         mMukiCupApi.sendImage(mImage, new ImageProperties(mContrast), mCupId);
     }
 
@@ -441,5 +508,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void hideProgress() {
         mProgressDialog.dismiss();
+    }
+
+    public void showBitmap(View view) {
+
+        Bitmap bmp = textAsBitmap(textToDisplayInBitmap.getText().toString(), 12F);
+        Intent intent = new Intent(this, ShowBitMapActivity.class);
+        intent.putExtra("BitmapImage", bmp);
+        startActivity(intent);
     }
 }
