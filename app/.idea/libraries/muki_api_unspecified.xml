@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="muki-api-unspecified">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/build/intermediates/exploded-aar/MukiTestApp/muki-api/unspecified/res" />
+      <root url="jar://$PROJECT_DIR$/build/intermediates/exploded-aar/MukiTestApp/muki-api/unspecified/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

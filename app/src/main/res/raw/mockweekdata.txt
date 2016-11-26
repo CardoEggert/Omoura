@@ -1,0 +1,8 @@
+score_resting_hr	score_temperature	score_activity_balance	score_previous_day	score_previous_night	summary_date	period_id	score	score_recovery_index	score_sleep_balance
+73	90	93	75	37	15.11.2016	1	68	95	65
+66	100	90	71	58	16.11.2016	0	67	63	67
+67	100	95	0	83	17.11.2016	0	73	59	70
+37	100	90	68	33	18.11.2016	0	53	70	61
+92	100	99	0	40	21.11.2016	1	72	90	63
+92	93	99	60	65	22.11.2016	1	78	100	67
+100	100	95	60	1	23.11.2016	0	61	66	57
