@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,18 +34,10 @@ import com.muki.core.util.ImageUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 //Muki code is taken from github, REFRENCE : https://github.com/gustavpaulig/Paulig-Muki
@@ -115,12 +105,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mSerialNumberEdit = (EditText) findViewById(R.id.serailNumberText);
-        textToDisplayInBitmap = (EditText) findViewById(R.id.textToDisplayInBitmap);
         mCupIdText = (TextView) findViewById(R.id.cupIdText);
         mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
         mCupImage = (ImageView) findViewById(R.id.imageSrc);
         mContrastSeekBar = (SeekBar) findViewById(R.id.contrastSeekBar);
-        buttonSave = (Button) findViewById(R.id.buttonSave);
         mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -141,14 +129,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        switch(random.nextInt(5)+1){
-            case 1: user = new User("Jeff", 25, 80.5, 75);
-            case 2: user = new User("Josephine", 18, 65.4, 65);
-            case 3: user = new User("Thomas", 35, 100.0, 55);
-            case 4: user = new User("Dracula", 100, 50.5, 7);
-            case 5: user = new User("Joe", 15, 40.2, 89);
+        switch (random.nextInt(5) + 1) {
+            case 1:
+                user = new User("Jeff", 25, 80.5, 75);
+            case 2:
+                user = new User("Josephine", 18, 65.4, 65);
+            case 3:
+                user = new User("Thomas", 35, 100.0, 55);
+            case 4:
+                user = new User("Dracula", 100, 50.5, 7);
+            case 5:
+                user = new User("Joe", 15, 40.2, 89);
         }
-        mCupImage.setImageBitmap(textAsBitmap(chooseNewsAccordingToUser(user), 12F));
+        //mCupImage.setImageBitmap(textAsBitmap(chooseNewsAccordingToUser(user), 12F));
         userCalendar = new Calendar();
 
         reset(null);
@@ -196,13 +189,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String chooseNewsAccordingToUser(User user) {
+/*    private String chooseNewsAccordingToUser(User user) {
         //List<String> news = readNewsData();
         //TODO: Filter
 
         Integer userAge = user.getAge();
         Double userWeight = user.getWeight();
-        return filterUserDependingUser(userAge, userWeight);
+        return filterUserDependingUser(userAge, userWeight);*/
 //        if (userWeight <= 100 && userAge < 30){
 //            return news.get(0);
 //        }else{
@@ -210,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        return news.get(2);
 
-    }
 
 
-    private String filterUserDependingUser(Integer userAge, Double userWeight) {
+
+    /*private String filterUserDependingUser(Integer userAge, Double userWeight) {
         Integer tempSwitch = null;
         if (userAge < 18) {
             tempSwitch = 0;
@@ -265,26 +258,26 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: filter data from BMI
         return null;
-    }
+    }*/
 
     private int readMockData() {
         List<String> relaxIndex = new ArrayList<>();
-        List<String> date = new ArrayList<>();
+        //List<String> date = new ArrayList<>();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(this.getResources().openRawResource(R.raw.mockweekdata)));
             String str;
             str = in.readLine();
             String[] splitted = str.split("\t");
             Integer summaryIndex = 0;
-            Integer dateIndex = 0;
+            //Integer dateIndex = 0;
             for (int i = 0; i < splitted.length; i++) {
-                if (splitted[i].equals("summary_date")) dateIndex = i;
+                //if (splitted[i].equals("summary_date")) dateIndex = i;
                 if (splitted[i].equals("score_recovery_index")) summaryIndex = i;
             }
             while ((str = in.readLine()) != null) {
                 String[] toBeAdded = str.split("\t");
                 relaxIndex.add(toBeAdded[summaryIndex]);
-                date.add(toBeAdded[dateIndex]);
+                //date.add(toBeAdded[dateIndex]);
             }
 
             in.close();
@@ -293,10 +286,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             System.out.println("IOExpection");
         }
-        return filterData(relaxIndex, date);
+        return filterData(relaxIndex);
     }
 
-    private int filterData(List<String> relaxIndex, List<String> date) {
+    private int filterData(List<String> relaxIndex) {
         //If under 85 last night then, check if relaxindex is under 70
         if (Integer.parseInt(relaxIndex.get(relaxIndex.size() - 1)) < 85) {
             //If relaxindes is under 70, check weekly average relaxindex
@@ -341,48 +334,68 @@ public class MainActivity extends AppCompatActivity {
 
     private int suggestResting() {
         Integer randomNr = random.nextInt(5) + 1;
-        switch(randomNr){
-            case 1: return R.drawable.resting1;
-            case 2: return R.drawable.resting2;
-            case 3: return R.drawable.resting3;
-            case 4: return R.drawable.resting4;
-            case 5: return R.drawable.resting5;
+        switch (randomNr) {
+            case 1:
+                return R.drawable.resting1;
+            case 2:
+                return R.drawable.resting2;
+            case 3:
+                return R.drawable.resting3;
+            case 4:
+                return R.drawable.resting4;
+            case 5:
+                return R.drawable.resting5;
         }
         return R.drawable.octocat2;
     }
 
     private int suggestMotivatingQuotes() {
         Integer randomNr = random.nextInt(5) + 1;
-        switch(randomNr){
-            case 1: return R.drawable.motivating1;
-            case 2: return R.drawable.motivating2;
-            case 3: return R.drawable.motivating3;
-            case 4: return R.drawable.motivating4;
-            case 5: return R.drawable.motivating5;
+        switch (randomNr) {
+            case 1:
+                return R.drawable.motivating1;
+            case 2:
+                return R.drawable.motivating2;
+            case 3:
+                return R.drawable.motivating3;
+            case 4:
+                return R.drawable.motivating4;
+            case 5:
+                return R.drawable.motivating5;
         }
         return R.drawable.octocat2;
     }
 
     private int suggestToRestWell() {
         Integer randomNr = random.nextInt(5) + 1;
-        switch(randomNr){
-            case 1: return R.drawable.restwell1;
-            case 2: return R.drawable.restwell2;
-            case 3: return R.drawable.restwell3;
-            case 4: return R.drawable.restwell4;
-            case 5: return R.drawable.restwell5;
+        switch (randomNr) {
+            case 1:
+                return R.drawable.restwell1;
+            case 2:
+                return R.drawable.restwell2;
+            case 3:
+                return R.drawable.restwell3;
+            case 4:
+                return R.drawable.restwell4;
+            case 5:
+                return R.drawable.restwell5;
         }
         return R.drawable.octocat2;
     }
 
     private int suggestTakingTimeOffDuringTheWeekend() {
         Integer randomNr = random.nextInt(5) + 1;
-        switch(randomNr){
-            case 1: return R.drawable.taketime1;
-            case 2: return R.drawable.taketime2;
-            case 3: return R.drawable.taketime3;
-            case 4: return R.drawable.taketime4;
-            case 5: return R.drawable.taketime5;
+        switch (randomNr) {
+            case 1:
+                return R.drawable.taketime1;
+            case 2:
+                return R.drawable.taketime2;
+            case 3:
+                return R.drawable.taketime3;
+            case 4:
+                return R.drawable.taketime4;
+            case 5:
+                return R.drawable.taketime5;
         }
         return R.drawable.octocat2;
     }
@@ -420,32 +433,31 @@ public class MainActivity extends AppCompatActivity {
             }
         }.execute();
     }
-
-    public Bitmap textAsBitmap(String text, float textSize) {
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(textSize);
-        paint.setColor(Color.WHITE);
-        paint.setTextAlign(Paint.Align.LEFT);
-        float baseline = -paint.ascent(); // ascent() is negative
-        int width = 176; // round
-        int height = 264;
-        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(image);
-//        while(text.length()!=0){
-//            canvas.drawText(text.substring(0,1),0,baseline,paint);
-//            text = text.substring(2);
+//
+//    public Bitmap textAsBitmap(String text, float textSize) {
+//        Paint paint = new Paint();
+//        paint.setStyle(Paint.Style.FILL);
+//        paint.setTextSize(textSize);
+//        paint.setColor(Color.WHITE);
+//        paint.setTextAlign(Paint.Align.LEFT);
+//        float baseline = -paint.ascent(); // ascent() is negative
+//        int width = 176; // round
+//        int height = 264;
+//        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(image);
+////        while(text.length()!=0){
+////            canvas.drawText(text.substring(0,1),0,baseline,paint);
+////            text = text.substring(2);
+////        }
+//        for (int i = 0; i < 264; i += 14) {
+//            canvas.drawText(text, 0, baseline + i, paint);
 //        }
-        for(int i= 0;i<264;i+=14) {
-            canvas.drawText(text, 0, baseline+i, paint);
-        }
-        return image;
-    }
+//        return image;
+//    }
 
     public void getData(View view) {
         int resource = readMockData();
-        Bitmap image = BitmapFactory.decodeResource(getResources(),resource);
-        mImage = image;
+        mImage = BitmapFactory.decodeResource(getResources(), resource);
         mCupImage.setImageBitmap(mImage);
 
     }
@@ -521,11 +533,5 @@ public class MainActivity extends AppCompatActivity {
         mProgressDialog.dismiss();
     }
 
-    public void showBitmap(View view) {
 
-        Bitmap bmp = textAsBitmap(textToDisplayInBitmap.getText().toString(), 12F);
-        Intent intent = new Intent(this, ShowBitMapActivity.class);
-        intent.putExtra("BitmapImage", bmp);
-        startActivity(intent);
-    }
 }

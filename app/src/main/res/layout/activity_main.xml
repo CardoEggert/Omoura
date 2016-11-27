@@ -52,26 +52,11 @@
         android:onClick="deviceInfo"
         android:text="Device info"/>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Name"
-        android:ems="10"
-        android:id="@+id/textToDisplayInBitmap" />
-
     <TextView
         android:id="@+id/deviceInfoText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
-
-    <Button
-        android:text="Save Bitmap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="showBitmap"
-        android:id="@+id/buttonSave" />
 
     <TextView
         android:layout_width="wrap_content"
