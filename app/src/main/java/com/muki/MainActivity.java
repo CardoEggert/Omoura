@@ -34,6 +34,8 @@ import com.muki.core.model.ErrorCode;
 import com.muki.core.model.ImageProperties;
 import com.muki.core.util.ImageUtils;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
     private Calendar userCalendar;
     private Button buttonSave;
+    private Button buttonRandomNews;
+    private TextView title;
 
     private User user;
 
@@ -115,12 +119,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mSerialNumberEdit = (EditText) findViewById(R.id.serailNumberText);
-        textToDisplayInBitmap = (EditText) findViewById(R.id.textToDisplayInBitmap);
         mCupIdText = (TextView) findViewById(R.id.cupIdText);
         mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
         mCupImage = (ImageView) findViewById(R.id.imageSrc);
-        mContrastSeekBar = (SeekBar) findViewById(R.id.contrastSeekBar);
-        buttonSave = (Button) findViewById(R.id.buttonSave);
+        buttonRandomNews = (Button) findViewById(R.id.button);
         mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -527,5 +529,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ShowBitMapActivity.class);
         intent.putExtra("BitmapImage", bmp);
         startActivity(intent);
+    }
+
+    public void randomMotivation(View view) {
+        int randomNr = random.nextInt(60)+1;
+        List<String> news = readNewsData(0,60);
+        mDeviceInfoText.setText(news.get(randomNr));
     }
 }
