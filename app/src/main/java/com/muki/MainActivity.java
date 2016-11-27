@@ -534,6 +534,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void giveMeOctoCat(View view) {
         mImage = BitmapFactory.decodeResource(getResources(),R.drawable.octocat2);
+        mCupImage.setImageBitmap(mImage);
         mMukiCupApi.sendImage(mImage,mCupId);
     }
 }
