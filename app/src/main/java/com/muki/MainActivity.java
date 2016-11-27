@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mCupIdText;
     private TextView mDeviceInfoText;
     private ImageView mCupImage;
-    private SeekBar mContrastSeekBar;
+    //private SeekBar mContrastSeekBar;
     private ProgressDialog mProgressDialog;
     private Calendar userCalendar;
     private Button buttonSave;
@@ -123,24 +123,24 @@ public class MainActivity extends AppCompatActivity {
         mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
         mCupImage = (ImageView) findViewById(R.id.imageSrc);
         buttonRandomNews = (Button) findViewById(R.id.button);
-        mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mContrast = i - 100;
-                showProgress();
-                setupImage();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
+//        mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                mContrast = i - 100;
+//                showProgress();
+//                setupImage();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
 
         switch(random.nextInt(5)+1){
@@ -449,6 +449,7 @@ public class MainActivity extends AppCompatActivity {
         Bitmap image = BitmapFactory.decodeResource(getResources(),resource);
         mImage = image;
         mCupImage.setImageBitmap(mImage);
+        mMukiCupApi.sendImage(mImage, mCupId);
 
     }
 
@@ -466,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.octocat2);
         mImage = ImageUtils.scaleBitmapToCupSize(image);
         mContrast = ImageProperties.DEFAULT_CONTRACT;
-        mContrastSeekBar.setProgress(100);
+        //mContrastSeekBar.setProgress(100);
         setupImage();
         image.recycle();
     }
@@ -523,17 +524,16 @@ public class MainActivity extends AppCompatActivity {
         mProgressDialog.dismiss();
     }
 
-    public void showBitmap(View view) {
 
-        Bitmap bmp = textAsBitmap(textToDisplayInBitmap.getText().toString(), 12F);
-        Intent intent = new Intent(this, ShowBitMapActivity.class);
-        intent.putExtra("BitmapImage", bmp);
-        startActivity(intent);
-    }
 
     public void randomMotivation(View view) {
         int randomNr = random.nextInt(60)+1;
         List<String> news = readNewsData(0,60);
         mDeviceInfoText.setText(news.get(randomNr));
+    }
+
+    public void giveMeOctoCat(View view) {
+        mImage = BitmapFactory.decodeResource(getResources(),R.drawable.octocat2);
+        mMukiCupApi.sendImage(mImage,mCupId);
     }
 }
